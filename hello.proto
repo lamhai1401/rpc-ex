@@ -1,0 +1,21 @@
+// phiên bản proto3
+syntax = "proto3";
+
+// tên package được sinh ra
+package model;
+option go_package="./model";
+
+// message là một đơn vị dữ liệu trong Protobuf
+message String {
+    // chuỗi string được truyền vào hàm RPC
+    string value = 1;
+}
+
+// định nghĩa service
+service HelloService {
+    // định nghĩa lời gọi hàm RPC
+    rpc Hello (String) returns (String);
+
+    // nhận vào tham số một stream và trả về giá trị là một stream.
+    rpc Channel (stream String) returns (stream String);
+}

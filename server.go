@@ -5,34 +5,28 @@ import (
 	"net"
 	"net/rpc"
 	"time"
+
+	"github.com/lamhai1401/rpc-ex/model"
+	"google.golang.org/grpc"
 )
 
-func runServer() {
-	rpc.RegisterName("KVStoreService", NewKVStoreService())
-	rpc.RegisterName("HelloService", new(HelloService))
-	// chạy rpc server trên port 1234
-	listener, err := net.Listen("tcp", ":1234")
-	// nếu có lỗi thì in ra
+func runGRPCServer() {
+	// khởi tạo một đối tượng gRPC service
+	grpcServer := grpc.NewServer()
+
+	// đăng ký service với grpcServer (của gRPC plugin)
+	model.RegisterHelloServiceServer(grpcServer, new(HelloServiceImpl))
+
+	// cung cấp gRPC service trên port `1234`
+	lis, err := net.Listen("tcp", ":1234")
 	if err != nil {
-		log.Fatal("ListenTCP error:", err)
+		log.Fatal(err)
 	}
-	// vòng lặp để phục vụ nhiều client
-	for {
-		// accept một connection đến
-		conn, err := listener.Accept()
-		// in ra lỗi nếu có
-		if err != nil {
-			log.Fatal("Accept error:", err)
-		}
-		// phục vụ client trên một goroutine khác
-		// để giải phóng main thread tiếp tục vòng lặp
-		rpc.ServeConn(conn)
-		conn.Close()
-	}
+	grpcServer.Serve(lis)
 }
 
 func runServeCallLient() {
-	rpc.Register(new(HelloService))
+	rpc.Register(new(KVStoreService))
 
 	for {
 		// chủ động gọi tới client

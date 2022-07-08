@@ -1,11 +1,14 @@
 package main
 
+import local "github.com/lamhai1401/rpc-ex/pubsub"
+
 func main() {
 	// go runServer()
-	go runServeCallLient()
+	// go runGRPCServer()
+	go local.Run()
 
-	// runClient()
-	runRPCClient()
+	go local.RunClientSub()
+	local.RunClientPub()
 
 	select {}
 }

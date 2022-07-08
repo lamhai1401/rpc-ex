@@ -3,6 +3,7 @@ module github.com/lamhai1401/rpc-ex
 go 1.18
 
 require (
+	github.com/moby/moby v20.10.17+incompatible
 	google.golang.org/grpc v1.47.0
 	google.golang.org/protobuf v1.28.0
 )

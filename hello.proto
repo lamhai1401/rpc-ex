@@ -27,3 +27,36 @@ service PubsubService {
     // service server streaming
     rpc Subscribe (String) returns (stream String);
 }
+
+// import "github.com/mwitkow/go-proto-validators/validator.proto";
+
+// định nghĩa message
+// message Message {
+//     // dấu ngoặc vuông mang ý nghĩa là phần tùy chọn
+//     string important_string = 1 [
+//         // regex sẽ validate trường important_string đúng theo syntax hay không
+//         (validator.field) = {regex: "^[a-z]{2,5}$"}
+//     ];
+//     int32 age = 2 [
+//         // tương tự, giá trị của a sẽ được validate lớn hơn 0 và nhỏ hơn 100
+//         (validator.field) = {int_gt: 0, int_lt: 100}
+//     ];
+// }
+
+
+// // import phần mở rộng của protobuf
+import "google/protobuf/descriptor.proto";
+
+// định nghĩa một số trường trong phần mở rộng
+extend google.protobuf.FieldOptions {
+    // những con số như: 50000, 50001 là duy nhất cho mỗi trường
+    string default_string = 50000;
+    int32 default_int = 50001;
+}
+// định nghĩa nội dung message
+message Message {
+    // default_string là giá trị mặc định cho name
+    string name = 1 [(default_string) = "gopher"];
+    // tương tự, age sẽ có giá trị 10 nếu không khởi trị
+    int32 age = 2[(default_int) = 10];
+}

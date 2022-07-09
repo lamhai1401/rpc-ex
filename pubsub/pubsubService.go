@@ -2,19 +2,45 @@ package pubsub
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
 	"strings"
 	"time"
 
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/lamhai1401/rpc-ex/model"
 	"github.com/moby/moby/pkg/pubsub"
 	"google.golang.org/grpc"
 )
 
+func filter(
+	ctx context.Context,
+	req interface{},
+	info *grpc.UnaryServerInfo,
+	handler grpc.UnaryHandler,
+) (resp interface{}, err error) {
+
+	log.Printf("filter: %v\n", info.FullMethod)
+
+	// nếu có exception thì throw về
+	defer func() {
+		// recover bắt giá trị của goroutine bị panic
+		if r := recover(); r != nil {
+			err = fmt.Errorf("panic: %v", r)
+		}
+	}()
+
+	return handler(ctx, req)
+}
+
 func Run() {
 	// khởi tạo một đối tượng gRPC service
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
+			filter,
+		)),
+	)
 
 	// đăng ký service với grpcServer (của gRPC plugin)
 	model.RegisterPubsubServiceServer(grpcServer, NewPubsubService())

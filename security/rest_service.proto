@@ -1,0 +1,33 @@
+syntax = "proto3";
+option go_package = "./security";
+package security;
+
+// chú ý: import annotations.proto để dùng chức năng grpc-gateway
+import "third_party/google/api/annotations.proto";
+
+message StringMessage {
+    string value = 1;
+}
+
+// định nghĩa RestService
+service RestService {
+    // định nghĩa hàm RPC Get trong service
+    rpc Get(StringMessage) returns (StringMessage) {
+        // nội dung phần option trong này định nghĩa Rest API ra bên ngoài
+        option (google.api.http) = {
+            // get: là tên phương thức được sử dụng
+            get: "/get/{value}"
+            // "/get/{value}" : là đường dẫn uri,
+            // trong đó {value} được pass vào uri là nội dung StringMessage request
+        };
+    }
+    // định nghĩa hàm RPC Post trong service
+    rpc Post(StringMessage) returns (StringMessage) {
+        option (google.api.http) = {
+            // dùng phương thức post
+            post: "/post"
+            // StringMessage sẽ dưới dạng chuỗi Json khi gửi Request (vd: '{"value":"Hello, World"}')
+            body: "*"
+        };
+    }
+}
